@@ -66,10 +66,12 @@ export const getProductController = async(request,response)=>{
             limit = 10
         }
 
+        // Use regex search instead of text search for better compatibility
         const query = search ? {
-            $text : {
-                $search : search
-            }
+            $or: [
+                { name: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } }
+            ]
         } : {}
 
         const skip = (page - 1) * limit
@@ -88,8 +90,9 @@ export const getProductController = async(request,response)=>{
             data : data
         })
     } catch (error) {
+        console.error('Get product controller error:', error)
         return response.status(500).json({
-            message : error.message || error,
+            message : error.message || "Internal server error",
             error : true,
             success : false
         })
@@ -276,11 +279,27 @@ export const searchProduct = async(request,response)=>{
             limit  = 10
         }
 
-        const query = search ? {
-            $text : {
-                $search : search
-            }
-        } : {}
+        // If no search term provided, return empty result
+        if(!search || search.trim() === ''){
+            return response.json({
+                message : "Product data",
+                error : false,
+                success : true,
+                data : [],
+                totalCount : 0,
+                totalPage : 0,
+                page : page,
+                limit : limit 
+            })
+        }
+
+        // Use regex search instead of text search for better compatibility
+        const query = {
+            $or: [
+                { name: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } }
+            ]
+        }
 
         const skip = ( page - 1) * limit
 
@@ -302,8 +321,9 @@ export const searchProduct = async(request,response)=>{
 
 
     } catch (error) {
+        console.error('Search product error:', error)
         return response.status(500).json({
-            message : error.message || error,
+            message : error.message || "Internal server error during search",
             error : true,
             success : false
         })
