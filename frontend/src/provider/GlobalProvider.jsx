@@ -23,6 +23,13 @@ const GlobalProvider = ({children}) => {
 
     const fetchCartItem = async()=>{
         try {
+          // Only fetch cart if user is authenticated
+          const accessToken = localStorage.getItem('accesstoken')
+          if (!accessToken) {
+            console.log('No access token found, skipping cart fetch')
+            return
+          }
+
           const response = await Axios({
             ...SummaryApi.getCartItem
           })
@@ -34,7 +41,11 @@ const GlobalProvider = ({children}) => {
           }
     
         } catch (error) {
-          console.log(error)
+          console.log('Cart fetch error:', error)
+          // Don't show error toast for 401 as it's expected when not logged in
+          if (error.response?.status !== 401) {
+            AxiosToastError(error)
+          }
         }
     }
 
@@ -104,6 +115,13 @@ const GlobalProvider = ({children}) => {
 
     const fetchAddress = async()=>{
       try {
+        // Only fetch address if user is authenticated
+        const accessToken = localStorage.getItem('accesstoken')
+        if (!accessToken) {
+          console.log('No access token found, skipping address fetch')
+          return
+        }
+
         const response = await Axios({
           ...SummaryApi.getAddress
         })
@@ -113,11 +131,22 @@ const GlobalProvider = ({children}) => {
           dispatch(handleAddAddress(responseData.data))
         }
       } catch (error) {
-          // AxiosToastError(error)
+          console.log('Address fetch error:', error)
+          // Don't show error toast for 401 as it's expected when not logged in
+          if (error.response?.status !== 401) {
+            AxiosToastError(error)
+          }
       }
     }
     const fetchOrder = async()=>{
       try {
+        // Only fetch orders if user is authenticated
+        const accessToken = localStorage.getItem('accesstoken')
+        if (!accessToken) {
+          console.log('No access token found, skipping order fetch')
+          return
+        }
+
         const response = await Axios({
           ...SummaryApi.getOrderItems,
         })
@@ -127,13 +156,16 @@ const GlobalProvider = ({children}) => {
             dispatch(setOrder(responseData.data))
         }
       } catch (error) {
-        console.log(error)
+        console.log('Order fetch error:', error)
+        // Don't show error toast for 401 as it's expected when not logged in
+        if (error.response?.status !== 401) {
+          AxiosToastError(error)
+        }
       }
     }
 
     useEffect(()=>{
       fetchCartItem()
-      handleLogoutOut()
       fetchAddress()
       fetchOrder()
     },[user])
