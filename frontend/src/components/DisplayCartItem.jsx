@@ -95,12 +95,24 @@ const DisplayCartItem = ({close}) => {
                             </div>
                         </>
                     ) : (
-                        <div className='bg-white flex flex-col justify-center items-center'>
+                        <div className='bg-white flex flex-col justify-center items-center p-6'>
                             <img
                                 src={imageEmpty}
-                                className='w-full h-full object-scale-down' 
+                                className='w-full h-full object-scale-down mb-4' 
                             />
-                            <Link onClick={close} to={"/"} className='block bg-green-600 px-4 py-2 text-white rounded'>Shop Now</Link>
+                            <Link onClick={close} to={"/"} className='block bg-green-600 px-6 py-3 text-white rounded font-semibold mb-4 hover:bg-green-700 transition-colors'>
+                                Shop Now
+                            </Link>
+                            {!user?._id && (
+                                <div className='text-center text-gray-600 text-sm max-w-xs'>
+                                    <p className='mb-2'>
+                                        🛒 <strong>Ready to shop?</strong>
+                                    </p>
+                                    <p>
+                                        <Link to="/login" className='text-green-600 hover:text-green-700 font-medium'>Login</Link> or <Link to="/register" className='text-green-600 hover:text-green-700 font-medium'>SignUp</Link> to add items to your cart and enjoy seamless shopping with quick delivery!
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     )
                 }
