@@ -21,8 +21,18 @@ function App() {
   
 
   const fetchUser = async()=>{
-      const userData = await fetchUserDetails()
-      dispatch(setUserDetails(userData.data))
+      try {
+        const userData = await fetchUserDetails()
+        if (userData && userData.data) {
+          dispatch(setUserDetails(userData.data))
+        }
+      } catch (error) {
+        console.log('Error fetching user details:', error)
+        // Don't show error toast for 401 as it's expected when not logged in
+        if (error.response?.status !== 401) {
+          console.error('User fetch error:', error)
+        }
+      }
   }
 
   const fetchCategory = async()=>{
@@ -37,7 +47,7 @@ function App() {
            dispatch(setAllCategory(responseData.data.sort((a, b) => a.name.localeCompare(b.name)))) 
         }
     } catch (error) {
-        
+        console.log('Category fetch error:', error)
     }finally{
       dispatch(setLoadingCategory(false))
     }
@@ -54,7 +64,7 @@ function App() {
            dispatch(setAllSubCategory(responseData.data.sort((a, b) => a.name.localeCompare(b.name)))) 
         }
     } catch (error) {
-        
+        console.log('Subcategory fetch error:', error)
     }finally{
     }
   }
