@@ -78,7 +78,7 @@ const ForgotPassword = () => {
                             });
                             setData({ email: "" });
                         }} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl">&times;</button>
-                        <h2 className="text-lg font-semibold mb-2 text-green-700">Your OTP (for testing)</h2>
+                        <h2 className="text-lg font-semibold mb-2 text-green-700">Your OTP</h2>
                         <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded text-xl font-bold mb-4">
                             <span>{otpValue}</span>
                         </div>
