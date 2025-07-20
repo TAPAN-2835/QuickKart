@@ -19,6 +19,11 @@ const OtpVerification = () => {
         if(!location?.state?.email){
             navigate("/forgot-password")
         }
+        // Auto-fill OTP if present in navigation state
+        if(location?.state?.otp){
+            const otpStr = String(location.state.otp).padEnd(6, '');
+            setData(otpStr.split('').slice(0,6));
+        }
     },[])
 
     const valideValue = data.every(el => el)

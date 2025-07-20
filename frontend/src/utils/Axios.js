@@ -24,24 +24,31 @@ Axios.interceptors.request.use(
 
 //extend the life span of access token with 
 // the help refresh
-Axios.interceptors.request.use(
+Axios.interceptors.response.use(
     (response)=>{
         return response
     },
     async(error)=>{
         let originRequest = error.config 
 
-        if(error.response.status === 401 && !originRequest.retry){
+        if(error.response?.status === 401 && !originRequest.retry){
             originRequest.retry = true
 
             const refreshToken = localStorage.getItem("refreshToken")
 
             if(refreshToken){
-                const newAccessToken = await refreshAccessToken(refreshToken)
+                try {
+                    const newAccessToken = await refreshAccessToken(refreshToken)
 
-                if(newAccessToken){
-                    originRequest.headers.Authorization = `Bearer ${newAccessToken}`
-                    return Axios(originRequest)
+                    if(newAccessToken){
+                        originRequest.headers.Authorization = `Bearer ${newAccessToken}`
+                        return Axios(originRequest)
+                    }
+                } catch (refreshError) {
+                    console.log('Token refresh failed:', refreshError)
+                    // Clear tokens on refresh failure
+                    localStorage.removeItem('accesstoken')
+                    localStorage.removeItem('refreshToken')
                 }
             }
         }
@@ -53,8 +60,9 @@ Axios.interceptors.request.use(
 
 const refreshAccessToken = async(refreshToken)=>{
     try {
-        const response = await Axios({
+        const response = await axios({
             ...SummaryApi.refreshToken,
+            baseURL: baseURL,
             headers : {
                 Authorization : `Bearer ${refreshToken}`
             }
@@ -64,7 +72,8 @@ const refreshAccessToken = async(refreshToken)=>{
         localStorage.setItem('accesstoken',accessToken)
         return accessToken
     } catch (error) {
-        console.log(error)
+        console.log('Refresh token error:', error)
+        throw error
     }
 }
 

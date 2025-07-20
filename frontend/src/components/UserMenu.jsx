@@ -5,6 +5,7 @@ import Divider from './Divider'
 import Axios from '../utils/Axios'
 import SummaryApi from '../common/SummaryApi'
 import { logout } from '../store/userSlice'
+import { handleAddItemCart } from '../store/cartProduct'
 import toast from 'react-hot-toast'
 import AxiosToastError from '../utils/AxiosToastError'
 import { HiOutlineExternalLink } from "react-icons/hi";
@@ -26,6 +27,7 @@ const UserMenu = ({close}) => {
               close()
             }
             dispatch(logout())
+            dispatch(handleAddItemCart([])) // clear cart on logout
             localStorage.clear()
             toast.success(response.data.message)
             navigate("/")

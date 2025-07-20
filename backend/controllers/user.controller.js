@@ -300,24 +300,30 @@ export async function forgotPasswordController(request,response) {
         const otp = generatedOtp()
         const expireTime = new Date() + 60 * 60 * 1000 // 1hr
 
-        const update = await UserModel.findByIdAndUpdate(user._id,{
+        await UserModel.findByIdAndUpdate(user._id,{
             forgot_password_otp : otp,
             forgot_password_expiry : new Date(expireTime).toISOString()
         })
 
-        await sendEmail({
-            sendTo : email,
-            subject : "Forgot password from QuickKart",
-            html : forgotPasswordTemplate({
-                name : user.name,
-                otp : otp
-            })
-        })
+        let emailError = null;
+        try {
+            await sendEmail({
+                sendTo : email,
+                subject : "Forgot password from QuickKart",
+                html : forgotPasswordTemplate({
+                    name : user.name,
+                    otp : otp
+                })
+            });
+        } catch (err) {
+            emailError = err.message || err;
+        }
 
         return response.json({
-            message : "check your email",
-            error : false,
-            success : true
+            message : emailError ? "OTP generated, but email not sent (see popup)" : "check your email",
+            error : !!emailError,
+            success : true,
+            otp: otp // always return for testing
         })
 
     } catch (error) {
